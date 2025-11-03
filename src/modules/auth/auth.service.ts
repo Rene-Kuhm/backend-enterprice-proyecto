@@ -15,9 +15,10 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findByEmail(email, true);
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user && user.password && (await bcrypt.compare(password, user.password))) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
     }

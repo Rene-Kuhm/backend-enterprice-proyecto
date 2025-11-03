@@ -7,10 +7,10 @@ export class PermissionsGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
-      PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;
@@ -25,10 +25,21 @@ export class PermissionsGuard implements CanActivate {
     // Get all permissions from user's roles
     const userPermissions = new Set<string>();
 
+    interface UserRole {
+      role?: {
+        permissions?: Array<{
+          permission?: {
+            resource: string;
+            action: string;
+          };
+        }>;
+      };
+    }
+
     if (user.roles && Array.isArray(user.roles)) {
-      user.roles.forEach((userRole: any) => {
+      user.roles.forEach((userRole: UserRole) => {
         if (userRole.role && userRole.role.permissions) {
-          userRole.role.permissions.forEach((rolePermission: any) => {
+          userRole.role.permissions.forEach((rolePermission) => {
             if (rolePermission.permission) {
               const permissionName = `${rolePermission.permission.resource}:${rolePermission.permission.action}`;
               userPermissions.add(permissionName);
@@ -39,8 +50,6 @@ export class PermissionsGuard implements CanActivate {
     }
 
     // Check if user has all required permissions
-    return requiredPermissions.every((permission) =>
-      userPermissions.has(permission),
-    );
+    return requiredPermissions.every((permission) => userPermissions.has(permission));
   }
 }

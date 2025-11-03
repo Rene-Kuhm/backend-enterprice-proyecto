@@ -101,10 +101,7 @@ async function bootstrap() {
     'Bootstrap',
   );
   loggerService.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`, 'Bootstrap');
-  loggerService.log(
-    `🏥 Health check: http://localhost:${port}/${apiPrefix}/health`,
-    'Bootstrap',
-  );
+  loggerService.log(`🏥 Health check: http://localhost:${port}/${apiPrefix}/health`, 'Bootstrap');
 }
 
 bootstrap();

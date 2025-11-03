@@ -11,7 +11,7 @@ export interface EmailOptions {
   to: string;
   subject: string;
   template?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   html?: string;
   text?: string;
 }
@@ -60,18 +60,14 @@ export class EmailService {
   }
 
   async queueEmail(options: EmailOptions, delay: number = 0): Promise<void> {
-    await this.emailQueue.add(
-      'send-email',
-      options,
-      {
-        delay,
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 2000,
-        },
+    await this.emailQueue.add('send-email', options, {
+      delay,
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 2000,
       },
-    );
+    });
 
     this.logger.log(`Email queued for ${options.to}`);
   }
@@ -89,11 +85,7 @@ export class EmailService {
     });
   }
 
-  async sendVerificationEmail(
-    email: string,
-    name: string,
-    token: string,
-  ): Promise<void> {
+  async sendVerificationEmail(email: string, name: string, token: string): Promise<void> {
     const verificationUrl = `${this.configService.get('APP_URL')}/verify-email?token=${token}`;
 
     await this.queueEmail({
@@ -109,11 +101,7 @@ export class EmailService {
     });
   }
 
-  async sendPasswordResetEmail(
-    email: string,
-    name: string,
-    token: string,
-  ): Promise<void> {
+  async sendPasswordResetEmail(email: string, name: string, token: string): Promise<void> {
     const resetUrl = `${this.configService.get('APP_URL')}/reset-password?token=${token}`;
 
     await this.queueEmail({
@@ -129,11 +117,7 @@ export class EmailService {
     });
   }
 
-  async send2FACodeEmail(
-    email: string,
-    name: string,
-    code: string,
-  ): Promise<void> {
+  async send2FACodeEmail(email: string, name: string, code: string): Promise<void> {
     await this.queueEmail({
       to: email,
       subject: 'Your 2FA Code',
@@ -162,13 +146,9 @@ export class EmailService {
 
   private async renderTemplate(
     templateName: string,
-    context: Record<string, any>,
+    context: Record<string, unknown>,
   ): Promise<string> {
-    const templatePath = path.join(
-      __dirname,
-      'templates',
-      `${templateName}.hbs`,
-    );
+    const templatePath = path.join(__dirname, 'templates', `${templateName}.hbs`);
 
     if (!fs.existsSync(templatePath)) {
       throw new Error(`Email template ${templateName} not found`);

@@ -50,18 +50,14 @@ export class SmsService {
   }
 
   async queueSms(options: SmsOptions, delay: number = 0): Promise<void> {
-    await this.smsQueue.add(
-      'send-sms',
-      options,
-      {
-        delay,
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 2000,
-        },
+    await this.smsQueue.add('send-sms', options, {
+      delay,
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 2000,
       },
-    );
+    });
 
     this.logger.log(`SMS queued for ${options.to}`);
   }

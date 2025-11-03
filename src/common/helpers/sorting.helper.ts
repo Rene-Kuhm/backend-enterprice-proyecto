@@ -7,10 +7,8 @@ export class SortingHelper {
   static buildOrderBy(
     sortBy: string = 'createdAt',
     sortOrder: 'asc' | 'desc' = 'desc',
-  ): any {
-    const validSortOrder = ['asc', 'desc'].includes(sortOrder)
-      ? sortOrder
-      : 'desc';
+  ): Record<string, unknown> {
+    const validSortOrder = ['asc', 'desc'].includes(sortOrder) ? sortOrder : 'desc';
 
     // Handle nested sorting (e.g., "user.name")
     if (sortBy.includes('.')) {

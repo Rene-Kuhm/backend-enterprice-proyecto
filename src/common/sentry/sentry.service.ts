@@ -16,10 +16,7 @@ export class SentryService implements OnModuleInit {
       Sentry.init({
         dsn,
         environment,
-        integrations: [
-          new ProfilingIntegration(),
-          new Sentry.Integrations.Http({ tracing: true }),
-        ],
+        integrations: [new ProfilingIntegration(), new Sentry.Integrations.Http({ tracing: true })],
         tracesSampleRate: environment === 'production' ? 0.1 : 1.0,
         profilesSampleRate: environment === 'production' ? 0.1 : 1.0,
       });
@@ -30,7 +27,7 @@ export class SentryService implements OnModuleInit {
     }
   }
 
-  captureException(exception: any, context?: Record<string, any>) {
+  captureException(exception: unknown, context?: Record<string, unknown>) {
     Sentry.captureException(exception, {
       extra: context,
     });
@@ -52,7 +49,7 @@ export class SentryService implements OnModuleInit {
     Sentry.addBreadcrumb(breadcrumb);
   }
 
-  setupGlobalFilter(app: INestApplication) {
+  setupGlobalFilter(_app: INestApplication) {
     // This will be implemented with a global exception filter
     // For now, we'll skip it as it requires additional setup
   }

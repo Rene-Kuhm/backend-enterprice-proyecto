@@ -1,10 +1,10 @@
 export interface FilterParams {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export class FilteringHelper {
-  static buildWhereClause(filters: FilterParams): any {
-    const where: any = {};
+  static buildWhereClause(filters: FilterParams): Record<string, unknown> {
+    const where: Record<string, unknown> = {};
 
     Object.entries(filters).forEach(([key, value]) => {
       if (value === undefined || value === null) {

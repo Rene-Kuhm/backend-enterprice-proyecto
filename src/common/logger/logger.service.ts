@@ -85,7 +85,7 @@ export class LoggerService implements NestLoggerService {
     });
   }
 
-  logSecurityEvent(event: string, details: any) {
+  logSecurityEvent(event: string, details: Record<string, unknown>) {
     this.logger.warn('Security Event', {
       event,
       ...details,

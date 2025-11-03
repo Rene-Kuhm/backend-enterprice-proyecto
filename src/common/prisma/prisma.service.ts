@@ -19,14 +19,14 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async onModuleInit() {
     // Log queries in development
     if (process.env.NODE_ENV === 'development') {
-      // @ts-ignore
+      // @ts-expect-error - Prisma types don't include event listeners properly
       this.$on('query', (e) => {
         this.logger.debug(`Query: ${e.query}`);
         this.logger.debug(`Duration: ${e.duration}ms`);
       });
     }
 
-    // @ts-ignore
+    // @ts-expect-error - Prisma types don't include event listeners properly
     this.$on('error', (e) => {
       this.logger.error(`Error: ${e.message}`);
     });
@@ -49,7 +49,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
     return Promise.all(
       models.map((modelKey) => {
-        // @ts-ignore
+        // @ts-expect-error - Dynamic model access doesn't have proper types
         return this[modelKey].deleteMany();
       }),
     );

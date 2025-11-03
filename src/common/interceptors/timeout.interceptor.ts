@@ -12,14 +12,12 @@ import { catchError, timeout } from 'rxjs/operators';
 export class TimeoutInterceptor implements NestInterceptor {
   constructor(private readonly timeoutMs: number = 30000) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     return next.handle().pipe(
       timeout(this.timeoutMs),
       catchError((err) => {
         if (err instanceof TimeoutError) {
-          return throwError(
-            () => new RequestTimeoutException('Request timeout'),
-          );
+          return throwError(() => new RequestTimeoutException('Request timeout'));
         }
         return throwError(() => err);
       }),

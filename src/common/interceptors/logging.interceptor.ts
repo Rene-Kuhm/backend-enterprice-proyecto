@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -12,7 +6,7 @@ import { tap } from 'rxjs/operators';
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInterceptor.name);
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
     const { method, url, body, user } = request;
     const userAgent = request.get('user-agent') || '';
@@ -32,7 +26,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap({
-        next: (data) => {
+        next: (_data) => {
           const response = context.switchToHttp().getResponse();
           const { statusCode } = response;
           const duration = Date.now() - now;
@@ -61,7 +55,7 @@ export class LoggingInterceptor implements NestInterceptor {
     );
   }
 
-  private sanitizeBody(body: any): any {
+  private sanitizeBody(body: Record<string, unknown>): Record<string, unknown> {
     if (!body) return body;
 
     const sanitized = { ...body };

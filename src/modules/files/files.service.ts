@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
+interface UploadedFile {
+  originalname: string;
+  filename: string;
+  mimetype: string;
+  size: number;
+  path: string;
+}
+
 @Injectable()
 export class FilesService {
   constructor(private prisma: PrismaService) {}
 
-  async upload(userId: string, file: any) {
+  async upload(userId: string, file: UploadedFile) {
     // TODO: Implement actual file upload to S3 or local storage
     return this.prisma.file.create({
       data: {

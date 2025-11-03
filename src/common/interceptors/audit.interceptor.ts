@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PrismaService } from '../prisma/prisma.service';
@@ -12,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AuditInterceptor implements NestInterceptor {
   constructor(private readonly prisma: PrismaService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
     const { method, url, user, body, ip } = request;
     const userAgent = request.get('user-agent') || '';
@@ -38,18 +33,18 @@ export class AuditInterceptor implements NestInterceptor {
     );
   }
 
-  private async createAuditLog(data: any) {
+  private async createAuditLog(data: Record<string, unknown>) {
     try {
       await this.prisma.auditLog.create({
         data: {
-          userId: data.userId,
-          action: data.action,
-          resource: data.resource,
-          resourceId: data.resourceId,
-          oldValue: data.oldValue || null,
-          newValue: data.newValue || null,
-          ipAddress: data.ipAddress,
-          userAgent: data.userAgent,
+          userId: data.userId as string,
+          action: data.action as string,
+          resource: data.resource as string,
+          resourceId: data.resourceId as string,
+          oldValue: data.oldValue ? JSON.parse(JSON.stringify(data.oldValue)) : null,
+          newValue: data.newValue ? JSON.parse(JSON.stringify(data.newValue)) : null,
+          ipAddress: data.ipAddress as string,
+          userAgent: data.userAgent as string,
         },
       });
     } catch (error) {

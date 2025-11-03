@@ -1,10 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, BadRequestException, Logger } from '@nestjs/common';
 import { Response } from 'express';
 
 @Catch(BadRequestException)
@@ -16,17 +10,14 @@ export class ValidationExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest();
     const status = exception.getStatus();
-    const exceptionResponse: any = exception.getResponse();
+    const exceptionResponse = exception.getResponse() as Record<string, unknown>;
 
-    let errors: any = {};
+    let errors: Record<string, string[]> | string = {};
 
-    if (
-      exceptionResponse.message &&
-      Array.isArray(exceptionResponse.message)
-    ) {
+    if (exceptionResponse.message && Array.isArray(exceptionResponse.message)) {
       errors = this.formatValidationErrors(exceptionResponse.message);
     } else {
-      errors = exceptionResponse.message || 'Validation failed';
+      errors = (exceptionResponse.message as string) || 'Validation failed';
     }
 
     const errorResponse = {
@@ -39,10 +30,7 @@ export class ValidationExceptionFilter implements ExceptionFilter {
       path: request.url,
     };
 
-    this.logger.warn(
-      `Validation Error: ${request.url}`,
-      JSON.stringify(errorResponse),
-    );
+    this.logger.warn(`Validation Error: ${request.url}`, JSON.stringify(errorResponse));
 
     response.status(status).json(errorResponse);
   }

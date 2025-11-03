@@ -28,7 +28,7 @@ export class AuthService {
     private smsService: SmsService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
       include: {
@@ -70,7 +70,8 @@ export class AuthService {
     // Reset failed login attempts on successful login
     await this.resetFailedLoginAttempts(user.id);
 
-    const { password: _, ...result } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
     return result;
   }
 
@@ -134,11 +135,12 @@ export class AuthService {
     // Send welcome email
     await this.emailService.sendWelcomeEmail(user.email, user.firstName || 'User');
 
-    const { password: _, ...result } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
     return result;
   }
 
-  async login(user: User, req: any) {
+  async login(user: User, req: { ip?: string; headers?: Record<string, string> }) {
     // Update last login
     await this.prisma.user.update({
       where: { id: user.id },
@@ -460,10 +462,11 @@ export class AuthService {
 
   // Helper methods
   private async generateTokens(user: User) {
+    const userWithRoles = user as User & { roles?: Array<{ role: { name: string } }> };
     const payload = {
       sub: user.id,
       email: user.email,
-      roles: user['roles'] ? user['roles'].map((ur: any) => ur.role.name) : [],
+      roles: userWithRoles.roles ? userWithRoles.roles.map((ur) => ur.role.name) : [],
     };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -497,15 +500,19 @@ export class AuthService {
     };
   }
 
-  private async createSession(userId: string, refreshToken: string, req: any) {
+  private async createSession(
+    userId: string,
+    refreshToken: string,
+    req: { ip?: string; headers?: Record<string, string> },
+  ) {
     const expiresAt = DateHelper.getExpiryDateFromDays(7);
 
     await this.prisma.session.create({
       data: {
         userId,
         refreshToken,
-        ipAddress: req.ip,
-        userAgent: req.get('user-agent'),
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers?.['user-agent'] || 'unknown',
         expiresAt,
       },
     });

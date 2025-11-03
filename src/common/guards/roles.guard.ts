@@ -7,10 +7,10 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (!requiredRoles || requiredRoles.length === 0) {
       return true;
@@ -23,7 +23,10 @@ export class RolesGuard implements CanActivate {
     }
 
     // Check if user has any of the required roles
-    const userRoles = user.roles?.map((ur: any) => ur.role.name) || [];
+    interface UserRole {
+      role: { name: string };
+    }
+    const userRoles = user.roles?.map((ur: UserRole) => ur.role.name) || [];
     return requiredRoles.some((role) => userRoles.includes(role));
   }
 }

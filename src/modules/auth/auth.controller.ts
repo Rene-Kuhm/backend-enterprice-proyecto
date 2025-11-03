@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 
@@ -9,9 +9,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  async register(
-    @Body() registerDto: { email: string; password: string; username?: string },
-  ) {
+  async register(@Body() registerDto: { email: string; password: string; username?: string }) {
     return this.authService.register(registerDto.email, registerDto.password, registerDto.username);
   }
 

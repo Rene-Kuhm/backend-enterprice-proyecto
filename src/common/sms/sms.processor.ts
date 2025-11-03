@@ -17,10 +17,7 @@ export class SmsProcessor {
       await this.smsService.sendSms(job.data);
       this.logger.log(`SMS job ${job.id} completed successfully`);
     } catch (error) {
-      this.logger.error(
-        `SMS job ${job.id} failed: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`SMS job ${job.id} failed: ${error.message}`, error.stack);
       throw error;
     }
   }
