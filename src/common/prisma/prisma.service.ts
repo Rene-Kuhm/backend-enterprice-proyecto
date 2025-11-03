@@ -20,14 +20,14 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     // Log queries in development
     if (process.env.NODE_ENV === 'development') {
       // @ts-expect-error - Prisma types don't include event listeners properly
-      this.$on('query', (e) => {
+      this.$on('query', (e: any) => {
         this.logger.debug(`Query: ${e.query}`);
         this.logger.debug(`Duration: ${e.duration}ms`);
       });
     }
 
     // @ts-expect-error - Prisma types don't include event listeners properly
-    this.$on('error', (e) => {
+    this.$on('error', (e: any) => {
       this.logger.error(`Error: ${e.message}`);
     });
 
@@ -45,7 +45,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       throw new Error('Cannot clean database in production');
     }
 
-    const models = Reflect.ownKeys(this).filter((key) => key[0] !== '_');
+    const models = Reflect.ownKeys(this).filter((key) => {
+      const keyStr = String(key);
+      return keyStr[0] !== '_';
+    });
 
     return Promise.all(
       models.map((modelKey) => {
